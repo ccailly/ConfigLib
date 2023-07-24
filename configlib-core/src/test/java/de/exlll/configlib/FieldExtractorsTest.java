@@ -7,9 +7,11 @@ import java.util.List;
 
 import static de.exlll.configlib.TestUtils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-class FieldExtractorsTest {
+class
+FieldExtractorsTest {
     @Test
     void extractConfigurationRequiresNonNull() {
         assertThrowsNullPointerException(
@@ -75,11 +77,17 @@ class FieldExtractorsTest {
         class B extends A {
             int i;
         }
-        assertThrowsConfigurationException(
+
+        List<Field> fields = FieldExtractors.CONFIGURATION.extract(B.class).toList();
+        assertThat(fields.size(), is(1));
+        assertThat(fields.get(0).getName(), is("i"));
+        assertThat(fields.get(0).getDeclaringClass(), equalTo(B.class));
+
+        /* assertThrowsConfigurationException(
                 () -> FieldExtractors.CONFIGURATION.extract(B.class),
                 "Shadowing of fields is not supported. Field 'i' of class B " +
                 "shadows field 'i' of class A."
-        );
+        ); */
     }
 
     @Test

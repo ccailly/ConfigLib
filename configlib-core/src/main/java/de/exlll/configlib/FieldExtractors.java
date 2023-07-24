@@ -19,10 +19,15 @@ enum FieldExtractors implements FieldExtractor {
             Validator.requireConfigurationClass(cls);
 
             List<Class<?>> classes = extractClassesWhile(cls, Reflect::isConfigurationClass);
-            List<Field> fields = classes.stream()
-                    .flatMap(c -> Arrays.stream(c.getDeclaredFields()))
-                    .filter(FieldFilters.DEFAULT)
-                    .toList();
+            List<Field> fields = new ArrayList<>();
+            for (Class<?> c : classes) {
+                for (Field field : c.getDeclaredFields()) {
+                    fields.removeIf(f -> f.getName().equals(field.getName()));
+                    fields.add(field);
+                }
+            }
+            fields = fields.stream().filter(FieldFilters.DEFAULT).toList();
+
             requireNoShadowing(fields);
             return fields.stream();
         }
